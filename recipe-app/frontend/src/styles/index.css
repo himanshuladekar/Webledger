@@ -1,0 +1,53 @@
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f8f8f8;
+  }
+  
+  a {
+    text-decoration: none;
+    color: #0066cc;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  button {
+    cursor: pointer;
+  }
+  
+  ul,
+  ol {
+    list-style: none;
+  }
+  
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin-bottom: 1rem;
+  }
+  
+  /* Container for consistent spacing */
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  

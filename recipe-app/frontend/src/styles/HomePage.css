@@ -1,0 +1,43 @@
+.home-page {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .hero-section {
+    text-align: center;
+    padding: 2rem 1rem;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+  
+  .hero-section h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  
+  .hero-section p {
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+  
+  .recipes-section {
+    width: 100%;
+  }
+  
+  .recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+  }
+  
+  .no-results,
+  .search-prompt {
+    text-align: center;
+    padding: 3rem 0;
+    color: #666;
+  }
+  
+  
