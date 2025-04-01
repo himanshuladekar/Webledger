@@ -18,8 +18,12 @@ app.use(cors())
 app.use(express.json())
 
 // Routes
+
 app.use("/api/users", require("./routes/authRoutes"))
 app.use("/api/recipes", require("./routes/recipeRoutes"))
+app.get("/", (req, res) => {
+  res.json({message: "server response"})
+})
 
 // Serve static assets in production
 if (process.env.NODE_ENV === "production") {
