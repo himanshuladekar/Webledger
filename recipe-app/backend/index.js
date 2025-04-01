@@ -26,13 +26,13 @@ app.get("/", (req, res) => {
 })
 
 // Serve static assets in production
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")))
+// if (process.env.NODE_ENV === "production") {
+//   app.use(express.static(path.join(__dirname, "../frontend/dist")))
 
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../frontend/dist", "index.html"))
-  })
-}
+//   app.get("*", (req, res) => {
+//     res.sendFile(path.resolve(__dirname, "../frontend/dist", "index.html"))
+//   })
+// }
 
 // Set port
 const PORT = process.env.PORT || 5000
