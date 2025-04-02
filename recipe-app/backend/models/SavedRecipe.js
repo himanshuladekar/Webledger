@@ -27,6 +27,10 @@ const savedRecipeSchema = mongoose.Schema(
           type: Number,
           required: true,
         },
+        isFavorite: {
+          type: Boolean,
+          default: false,
+        },
       },
     ],
   },

@@ -51,16 +51,53 @@ export const getSavedRecipes = async () => {
     return response.data
   } catch (error) {
     console.error("Error getting saved recipes:", error)
-    throw error
+    if (error.response && error.response.status === 401) {
+      // If unauthorized, clear token and return empty array
+      localStorage.removeItem("userToken")
+      localStorage.removeItem("userInfo")
+    }
+    return []
+  }
+}
+
+export const getFavoriteRecipes = async () => {
+  try {
+    const response = await api.get("/recipes/favorites")
+    return response.data
+  } catch (error) {
+    console.error("Error getting favorite recipes:", error)
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("userToken")
+      localStorage.removeItem("userInfo")
+    }
+    return []
   }
 }
 
 export const saveRecipe = async (recipeData) => {
   try {
     const response = await api.post("/recipes/saved", recipeData)
+    // Dispatch an event to notify that a recipe was saved
+    window.dispatchEvent(new CustomEvent("recipe-saved", { detail: response.data }))
     return response.data
   } catch (error) {
     console.error("Error saving recipe:", error)
+    if (error.response && error.response.status === 400 && error.response.data.message === "Recipe already saved") {
+      // If recipe is already saved, just return success
+      return { success: true, message: "Recipe already saved" }
+    }
+    throw error
+  }
+}
+
+export const toggleFavorite = async (recipeId, isFavorite) => {
+  try {
+    const response = await api.put(`/recipes/saved/${recipeId}/favorite`, { isFavorite })
+    // Dispatch an event to notify that a recipe's favorite status was changed
+    window.dispatchEvent(new CustomEvent("favorite-toggled", { detail: response.data }))
+    return response.data
+  } catch (error) {
+    console.error("Error toggling favorite status:", error)
     throw error
   }
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { getRecipeById, saveRecipe } from "../services/api"
+import { getRecipeById, saveRecipe, getSavedRecipes, toggleFavorite } from "../services/api"
 import { isAuthenticated } from "../services/auth"
 import "../styles/RecipeDetail.css"
 
@@ -12,6 +12,7 @@ const RecipeDetail = () => {
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [favorite, setFavorite] = useState(false)
   const { id } = useParams()
   const navigate = useNavigate()
 
@@ -21,6 +22,21 @@ const RecipeDetail = () => {
         setLoading(true)
         const data = await getRecipeById(id)
         setRecipe(data)
+
+        // Check if recipe is already saved and if it's a favorite
+        if (isAuthenticated()) {
+          try {
+            const savedRecipes = await getSavedRecipes()
+            const savedRecipe = savedRecipes.find((r) => r.recipeId === id.toString())
+
+            if (savedRecipe) {
+              setSaved(true)
+              setFavorite(savedRecipe.isFavorite || false)
+            }
+          } catch (err) {
+            console.error("Error checking if recipe is saved:", err)
+          }
+        }
       } catch (err) {
         setError("Failed to load recipe details")
         console.error(err)
@@ -47,14 +63,81 @@ const RecipeDetail = () => {
         sourceUrl: recipe.sourceUrl,
       })
       setSaved(true)
+
+      // Show success message
+      showNotification("Recipe saved successfully!")
     } catch (err) {
       console.error("Error saving recipe:", err)
       if (err.response && err.response.status === 400 && err.response.data.message === "Recipe already saved") {
         setSaved(true)
+        showNotification("This recipe is already in your saved recipes.")
+      } else {
+        showNotification("Failed to save recipe. Please try again.", "error")
       }
     } finally {
       setSaving(false)
     }
+  }
+
+  const handleToggleFavorite = async () => {
+    if (!isAuthenticated()) {
+      navigate("/login")
+      return
+    }
+
+    if (!saved) {
+      // If not saved yet, save it first with favorite status
+      try {
+        setSaving(true)
+        await saveRecipe({
+          recipeId: recipe.id.toString(),
+          title: recipe.title,
+          image: recipe.image,
+          sourceUrl: recipe.sourceUrl,
+          isFavorite: true,
+        })
+        setSaved(true)
+        setFavorite(true)
+        showNotification("Recipe added to favorites!")
+      } catch (err) {
+        console.error("Error saving recipe as favorite:", err)
+        showNotification("Failed to add to favorites. Please try again.", "error")
+      } finally {
+        setSaving(false)
+      }
+      return
+    }
+
+    try {
+      setSaving(true)
+      const newStatus = !favorite
+      await toggleFavorite(recipe.id.toString(), newStatus)
+      setFavorite(newStatus)
+      showNotification(newStatus ? "Added to favorites!" : "Removed from favorites")
+    } catch (err) {
+      console.error("Error toggling favorite:", err)
+      showNotification("Failed to update favorite status. Please try again.", "error")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const showNotification = (message, type = "success") => {
+    // Create notification element
+    const notification = document.createElement("div")
+    notification.className = `notification ${type}`
+    notification.textContent = message
+
+    // Add to document
+    document.body.appendChild(notification)
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+      notification.classList.add("hide")
+      setTimeout(() => {
+        document.body.removeChild(notification)
+      }, 300)
+    }, 3000)
   }
 
   if (loading) {
@@ -73,14 +156,26 @@ const RecipeDetail = () => {
     <div className="recipe-detail">
       <div className="recipe-header">
         <h1>{recipe.title}</h1>
-        <button className={`save-button ${saved ? "saved" : ""}`} onClick={handleSave} disabled={saving || saved}>
-          {saving ? "Saving..." : saved ? "Saved" : "Save Recipe"}
-        </button>
+        <div className="recipe-actions">
+          <button
+            className={`favorite-button ${favorite ? "favorited" : ""}`}
+            onClick={handleToggleFavorite}
+            disabled={saving}
+          >
+            {favorite ? "★ Favorited" : "☆ Add to Favorites"}
+          </button>
+
+          {!saved && (
+            <button className="save-button" onClick={handleSave} disabled={saving || saved}>
+              {saving ? "Saving..." : "Save Recipe"}
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="recipe-image">
         <img
-          src={recipe.image || "/placeholder.svg"}
+          src={recipe.image || "https://via.placeholder.com/600x400?text=No+Image"}
           alt={recipe.title}
           onError={(e) => {
             e.target.onerror = null

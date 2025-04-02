@@ -1,19 +1,35 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import { DragDropContext } from '@hello-pangea/dnd'
-import { getSavedRecipes, removeSavedRecipe, reorderSavedRecipes } from "../services/api"
+import { Link, useNavigate } from "react-router-dom"
+import { DragDropContext} from "@hello-pangea/dnd"
+import { getSavedRecipes, removeSavedRecipe, reorderSavedRecipes, toggleFavorite } from "../services/api"
+import { isAuthenticated } from "../services/auth"
 import "../styles/SavedRecipes.css"
 
 const SavedRecipes = () => {
   const [recipes, setRecipes] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
+    if (!isAuthenticated()) {
+      navigate("/login")
+      return
+    }
+
     fetchSavedRecipes()
-  }, [])
+
+    // Add event listeners for recipe saved and favorite toggled events
+    window.addEventListener("recipe-saved", fetchSavedRecipes)
+    window.addEventListener("favorite-toggled", fetchSavedRecipes)
+
+    return () => {
+      window.removeEventListener("recipe-saved", fetchSavedRecipes)
+      window.removeEventListener("favorite-toggled", fetchSavedRecipes)
+    }
+  }, [navigate])
 
   const fetchSavedRecipes = async () => {
     try {
@@ -21,8 +37,8 @@ const SavedRecipes = () => {
       const data = await getSavedRecipes()
       setRecipes(data)
     } catch (err) {
-      setError("Failed to load saved recipes")
-      console.error(err)
+      console.error("Error fetching saved recipes:", err)
+      setError("Failed to load saved recipes. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -32,8 +48,26 @@ const SavedRecipes = () => {
     try {
       await removeSavedRecipe(recipeId)
       setRecipes(recipes.filter((recipe) => recipe.recipeId !== recipeId))
+      showNotification("Recipe removed successfully")
     } catch (err) {
       console.error("Error removing recipe:", err)
+      showNotification("Failed to remove recipe", "error")
+    }
+  }
+
+  const handleToggleFavorite = async (recipeId, currentStatus) => {
+    try {
+      await toggleFavorite(recipeId, !currentStatus)
+
+      // Update local state
+      setRecipes(
+        recipes.map((recipe) => (recipe.recipeId === recipeId ? { ...recipe, isFavorite: !currentStatus } : recipe)),
+      )
+
+      showNotification(!currentStatus ? "Added to favorites!" : "Removed from favorites")
+    } catch (err) {
+      console.error("Error toggling favorite:", err)
+      showNotification("Failed to update favorite status", "error")
     }
   }
 
@@ -71,6 +105,24 @@ const SavedRecipes = () => {
       // If there's an error, fetch the recipes again to ensure UI is in sync
       fetchSavedRecipes()
     }
+  }
+
+  const showNotification = (message, type = "success") => {
+    // Create notification element
+    const notification = document.createElement("div")
+    notification.className = `notification ${type}`
+    notification.textContent = message
+
+    // Add to document
+    document.body.appendChild(notification)
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+      notification.classList.add("hide")
+      setTimeout(() => {
+        document.body.removeChild(notification)
+      }, 300)
+    }, 3000)
   }
 
   if (loading) {
@@ -129,6 +181,13 @@ const SavedRecipes = () => {
                         </h3>
                       </div>
                       <div className="recipe-actions">
+                        <button
+                          className={`favorite-toggle ${recipe.isFavorite ? "favorited" : ""}`}
+                          onClick={() => handleToggleFavorite(recipe.recipeId, recipe.isFavorite)}
+                          title={recipe.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                        >
+                          {recipe.isFavorite ? "★" : "☆"}
+                        </button>
                         <button className="remove-button" onClick={() => handleRemove(recipe.recipeId)}>
                           Remove
                         </button>

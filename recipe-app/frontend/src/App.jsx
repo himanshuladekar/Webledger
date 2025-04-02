@@ -4,9 +4,9 @@ import Header from "./components/Header"
 import HomePage from "./pages/HomePage"
 import RecipeDetailPage from "./pages/RecipeDetailPage"
 import SavedRecipesPage from "./pages/SavedRecipesPage"
+import FavoritesPage from "./pages/FavoritesPage"
 import LoginPage from "./pages/LoginPage"
 import RegisterPage from "./pages/RegisterPage"
-
 import "./styles/App.css"
 
 // Protected route component
@@ -31,6 +31,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <SavedRecipesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/favorites"
+              element={
+                <ProtectedRoute>
+                  <FavoritesPage />
                 </ProtectedRoute>
               }
             />

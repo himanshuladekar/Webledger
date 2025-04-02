@@ -1,43 +1,228 @@
 .home-page {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-  
-  .hero-section {
-    text-align: center;
-    padding: 2rem 1rem;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.hero-section {
+  text-align: center;
+  padding: 4rem 1rem;
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7)),
+    url("https://via.placeholder.com/1200x400?text=Food+Background");
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.hero-section h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #333;
+  font-weight: 800;
+}
+
+.hero-section p {
+  color: #555;
+  margin-bottom: 2rem;
+  font-size: 1.2rem;
+}
+
+.popular-searches {
+  margin-top: 2rem;
+}
+
+.popular-searches p {
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  color: #666;
+}
+
+.search-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.search-tag {
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 50px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.search-tag:hover {
+  background-color: #e0e0e0;
+  transform: translateY(-2px);
+}
+
+.featured-categories {
+  padding: 2rem 0;
+}
+
+.featured-categories h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: #333;
+  position: relative;
+}
+
+.featured-categories h2:after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background-color: #0066cc;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.category-card {
+  background-color: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.category-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.category-image {
+  height: 180px;
+  overflow: hidden;
+}
+
+.category-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.category-card:hover .category-image img {
+  transform: scale(1.05);
+}
+
+.category-card h3 {
+  padding: 1.25rem;
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+  text-align: center;
+  font-weight: 700;
+}
+
+.recipes-section {
+  width: 100%;
+}
+
+.search-results-title {
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2.5rem;
+}
+
+.no-results,
+.search-prompt {
+  text-align: center;
+  padding: 4rem 0;
+  color: #666;
+  font-size: 1.1rem;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+}
+
+.cooking-tips {
+  margin-top: 3rem;
+  padding: 2rem 0;
+}
+
+.cooking-tips h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: #333;
+  position: relative;
+}
+
+.cooking-tips h2:after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background-color: #0066cc;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.tip-card {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s;
+}
+
+.tip-card:hover {
+  transform: translateY(-5px);
+}
+
+.tip-card h3 {
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.4rem;
+}
+
+.tip-card p {
+  color: #666;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
   .hero-section h1 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    color: #333;
+    font-size: 2.2rem;
   }
-  
-  .hero-section p {
-    color: #666;
-    margin-bottom: 1.5rem;
-  }
-  
-  .recipes-section {
-    width: 100%;
-  }
-  
+
   .recipe-grid {
-    display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 2rem;
+    gap: 1.5rem;
   }
-  
-  .no-results,
-  .search-prompt {
-    text-align: center;
-    padding: 3rem 0;
-    color: #666;
+
+  .category-grid,
+  .tips-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
   }
-  
-  
+}
+

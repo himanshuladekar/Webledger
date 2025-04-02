@@ -12,6 +12,19 @@ const Header = () => {
   useEffect(() => {
     const userInfo = getUserInfo()
     setUser(userInfo)
+
+    // Add event listener for login/register
+    const handleUserLogin = () => {
+      const updatedUserInfo = getUserInfo()
+      setUser(updatedUserInfo)
+    }
+
+    window.addEventListener("user-login", handleUserLogin)
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("user-login", handleUserLogin)
+    }
   }, [])
 
   const handleLogout = () => {
@@ -34,6 +47,9 @@ const Header = () => {
             <>
               <li>
                 <Link to="/saved">My Recipes</Link>
+              </li>
+              <li>
+                <Link to="/favorites">Favorites</Link>
               </li>
               <li>
                 <button className="logout-btn" onClick={handleLogout}>

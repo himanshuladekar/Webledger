@@ -73,6 +73,7 @@ exports.getSavedRecipes = async (req, res) => {
 
     res.json(savedRecipes.recipes)
   } catch (error) {
+    console.error("Error getting saved recipes:", error)
     res.status(500).json({ message: error.message })
   }
 }
@@ -82,7 +83,7 @@ exports.getSavedRecipes = async (req, res) => {
 exports.saveRecipe = async (req, res) => {
   try {
     const userId = req.user._id
-    const { recipeId, title, image, sourceUrl } = req.body
+    const { recipeId, title, image, sourceUrl, isFavorite } = req.body
 
     if (!recipeId || !title) {
       return res.status(400).json({ message: "Recipe ID and title are required" })
@@ -99,10 +100,14 @@ exports.saveRecipe = async (req, res) => {
     }
 
     // Check if recipe is already saved
-    const recipeExists = savedRecipes.recipes.some((recipe) => recipe.recipeId === recipeId)
+    const existingRecipeIndex = savedRecipes.recipes.findIndex((recipe) => recipe.recipeId === recipeId)
 
-    if (recipeExists) {
-      return res.status(400).json({ message: "Recipe already saved" })
+    if (existingRecipeIndex !== -1) {
+      // Update existing recipe if it's already saved
+      savedRecipes.recipes[existingRecipeIndex].isFavorite =
+        isFavorite !== undefined ? isFavorite : savedRecipes.recipes[existingRecipeIndex].isFavorite
+      await savedRecipes.save()
+      return res.status(200).json(savedRecipes.recipes)
     }
 
     // Add new recipe at the end of the list
@@ -114,11 +119,44 @@ exports.saveRecipe = async (req, res) => {
       image,
       sourceUrl,
       position,
+      isFavorite: isFavorite || false,
     })
 
     await savedRecipes.save()
 
     res.status(201).json(savedRecipes.recipes)
+  } catch (error) {
+    console.error("Error saving recipe:", error)
+    res.status(500).json({ message: error.message })
+  }
+}
+
+// Toggle favorite status for a recipe
+// PUT /api/recipes/saved/:id/favorite
+exports.toggleFavorite = async (req, res) => {
+  try {
+    const userId = req.user._id
+    const recipeId = req.params.id
+    const { isFavorite } = req.body
+
+    const savedRecipes = await SavedRecipe.findOne({ user: userId })
+
+    if (!savedRecipes) {
+      return res.status(404).json({ message: "No saved recipes found" })
+    }
+
+    const recipeIndex = savedRecipes.recipes.findIndex((r) => r.recipeId === recipeId)
+
+    if (recipeIndex === -1) {
+      return res.status(404).json({ message: "Recipe not found in saved list" })
+    }
+
+    // Toggle favorite status
+    savedRecipes.recipes[recipeIndex].isFavorite = isFavorite
+
+    await savedRecipes.save()
+
+    res.json(savedRecipes.recipes)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
@@ -198,6 +236,30 @@ exports.reorderSavedRecipes = async (req, res) => {
 
     res.json(savedRecipes.recipes)
   } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+// Get favorite recipes
+// GET /api/recipes/favorites
+exports.getFavoriteRecipes = async (req, res) => {
+  try {
+    const userId = req.user._id
+
+    const savedRecipes = await SavedRecipe.findOne({ user: userId })
+
+    if (!savedRecipes) {
+      return res.json([])
+    }
+
+    // Filter and sort favorite recipes
+    const favoriteRecipes = savedRecipes.recipes
+      .filter((recipe) => recipe.isFavorite)
+      .sort((a, b) => a.position - b.position)
+
+    res.json(favoriteRecipes)
+  } catch (error) {
+    console.error("Error getting favorite recipes:", error)
     res.status(500).json({ message: error.message })
   }
 }

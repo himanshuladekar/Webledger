@@ -18,21 +18,18 @@ app.use(cors())
 app.use(express.json())
 
 // Routes
-
 app.use("/api/users", require("./routes/authRoutes"))
+// Change the order of route registration to ensure specific routes are matched first
 app.use("/api/recipes", require("./routes/recipeRoutes"))
-app.get("/", (req, res) => {
-  res.json({message: "server response"})
-})
 
 // Serve static assets in production
-// if (process.env.NODE_ENV === "production") {
-//   app.use(express.static(path.join(__dirname, "../frontend/dist")))
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")))
 
-//   app.get("*", (req, res) => {
-//     res.sendFile(path.resolve(__dirname, "../frontend/dist", "index.html"))
-//   })
-// }
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "../frontend/dist", "index.html"))
+  })
+}
 
 // Set port
 const PORT = process.env.PORT || 5000

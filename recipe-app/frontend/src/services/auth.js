@@ -6,6 +6,8 @@ export const register = async (username, password) => {
     if (response.data) {
       localStorage.setItem("userInfo", JSON.stringify(response.data))
       localStorage.setItem("userToken", response.data.token)
+      // Add this line to trigger a refresh event
+      window.dispatchEvent(new Event("user-login"))
     }
     return response.data
   } catch (error) {
@@ -20,6 +22,8 @@ export const login = async (username, password) => {
     if (response.data) {
       localStorage.setItem("userInfo", JSON.stringify(response.data))
       localStorage.setItem("userToken", response.data.token)
+      // Add this line to trigger a refresh event
+      window.dispatchEvent(new Event("user-login"))
     }
     return response.data
   } catch (error) {
