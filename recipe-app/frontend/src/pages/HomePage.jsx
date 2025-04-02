@@ -22,10 +22,10 @@ const popularSearches = [
 ]
 
 const featuredCategories = [
-  { name: "Quick & Easy", image: "https://via.placeholder.com/300x200?text=Quick+%26+Easy", query: "quick easy" },
-  { name: "Healthy", image: "https://via.placeholder.com/300x200?text=Healthy", query: "healthy" },
-  { name: "Vegetarian", image: "https://via.placeholder.com/300x200?text=Vegetarian", query: "vegetarian" },
-  { name: "Desserts", image: "https://via.placeholder.com/300x200?text=Desserts", query: "dessert" },
+  { name: "Quick & Easy", image: "https://th.bing.com/th/id/OIP.J0IJK5sgC_Wbu5F_VqV28wHaMi?pid=ImgDet&w=178&h=301&c=7&dpr=1.3", query: "quick easy" },
+  { name: "Healthy", image: "https://th.bing.com/th/id/OIP.0yxXBfKOO0f9d18hdSDQHgHaE8?w=290&h=193&c=7&r=0&o=5&dpr=1.3&pid=1.7", query: "healthy" },
+  { name: "Vegetarian", image: "https://th.bing.com/th/id/OIP.73PiizCPMdrXPaQivowJpgHaE8?w=252&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7", query: "vegetarian" },
+  { name: "Desserts", image: "https://th.bing.com/th/id/OIP.UP_XBprUBcd2LUqDUfXfoAHaGC?w=237&h=193&c=7&r=0&o=5&dpr=1.3&pid=1.7", query: "dessert" },
 ]
 
 const HomePage = () => {
