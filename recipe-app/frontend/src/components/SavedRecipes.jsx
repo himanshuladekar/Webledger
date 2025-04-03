@@ -22,12 +22,16 @@ const SavedRecipes = () => {
     fetchSavedRecipes()
 
     // Add event listeners for recipe saved and favorite toggled events
-    window.addEventListener("recipe-saved", fetchSavedRecipes)
-    window.addEventListener("favorite-toggled", fetchSavedRecipes)
+    const handleRecipeEvent = () => {
+      fetchSavedRecipes()
+    }
+
+    window.addEventListener("recipe-saved", handleRecipeEvent)
+    window.addEventListener("favorite-toggled", handleRecipeEvent)
 
     return () => {
-      window.removeEventListener("recipe-saved", fetchSavedRecipes)
-      window.removeEventListener("favorite-toggled", fetchSavedRecipes)
+      window.removeEventListener("recipe-saved", handleRecipeEvent)
+      window.removeEventListener("favorite-toggled", handleRecipeEvent)
     }
   }, [navigate])
 

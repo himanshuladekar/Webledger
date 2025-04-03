@@ -36,7 +36,7 @@ const Header = () => {
   return (
     <header className="header">
       <div className="logo">
-        <Link to="/">Recipe Finder</Link>
+        <Link to="/">Cookbook Compass</Link>
       </div>
       <nav className="nav">
         <ul>

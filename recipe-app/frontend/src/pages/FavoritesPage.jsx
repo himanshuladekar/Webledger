@@ -22,23 +22,28 @@ const FavoritesPage = () => {
     fetchFavorites()
 
     // Listen for favorite toggle events
-    const handleFavoriteToggled = () => {
+    const handleFavoriteEvent = () => {
+      console.log("Favorite event detected in FavoritesPage")
       fetchFavorites()
     }
 
-    window.addEventListener("favorite-toggled", handleFavoriteToggled)
-    window.addEventListener("recipe-saved", handleFavoriteToggled)
+    window.addEventListener("favorite-toggled", handleFavoriteEvent)
+    window.addEventListener("recipe-saved", handleFavoriteEvent)
+    window.addEventListener("user-login", handleFavoriteEvent)
 
     return () => {
-      window.removeEventListener("favorite-toggled", handleFavoriteToggled)
-      window.removeEventListener("recipe-saved", handleFavoriteToggled)
+      window.removeEventListener("favorite-toggled", handleFavoriteEvent)
+      window.removeEventListener("recipe-saved", handleFavoriteEvent)
+      window.removeEventListener("user-login", handleFavoriteEvent)
     }
   }, [navigate])
 
   const fetchFavorites = async () => {
     try {
       setLoading(true)
+      console.log("Fetching favorites in FavoritesPage component")
       const data = await getFavoriteRecipes()
+      console.log("Favorites in FavoritesPage component:", data)
       setFavorites(data)
     } catch (err) {
       console.error("Error fetching favorites:", err)
@@ -52,9 +57,29 @@ const FavoritesPage = () => {
     try {
       await toggleFavorite(recipeId, false)
       setFavorites(favorites.filter((recipe) => recipe.recipeId !== recipeId))
+      showNotification("Removed from favorites")
     } catch (err) {
       console.error("Error removing from favorites:", err)
+      showNotification("Failed to update favorites", "error")
     }
+  }
+
+  const showNotification = (message, type = "success") => {
+    // Create notification element
+    const notification = document.createElement("div")
+    notification.className = `notification ${type}`
+    notification.textContent = message
+
+    // Add to document
+    document.body.appendChild(notification)
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+      notification.classList.add("hide")
+      setTimeout(() => {
+        document.body.removeChild(notification)
+      }, 300)
+    }, 3000)
   }
 
   if (loading) {

@@ -47,7 +47,9 @@ export const getRecipeById = async (id) => {
 
 export const getSavedRecipes = async () => {
   try {
+    console.log("Fetching saved recipes")
     const response = await api.get("/recipes/saved")
+    console.log("Saved recipes response:", response.data)
     return response.data
   } catch (error) {
     console.error("Error getting saved recipes:", error)
@@ -62,7 +64,9 @@ export const getSavedRecipes = async () => {
 
 export const getFavoriteRecipes = async () => {
   try {
+    console.log("Fetching favorite recipes")
     const response = await api.get("/recipes/favorites")
+    console.log("Favorite recipes response:", response.data)
     return response.data
   } catch (error) {
     console.error("Error getting favorite recipes:", error)
@@ -76,25 +80,35 @@ export const getFavoriteRecipes = async () => {
 
 export const saveRecipe = async (recipeData) => {
   try {
+    console.log("Saving recipe:", recipeData)
     const response = await api.post("/recipes/saved", recipeData)
-    // Dispatch an event to notify that a recipe was saved
-    window.dispatchEvent(new CustomEvent("recipe-saved", { detail: response.data }))
+    console.log("Save recipe response:", response.data)
+
+    // Create a custom event with the response data
+    const event = new CustomEvent("recipe-saved", {
+      detail: response.data,
+    })
+    window.dispatchEvent(event)
+
     return response.data
   } catch (error) {
     console.error("Error saving recipe:", error)
-    if (error.response && error.response.status === 400 && error.response.data.message === "Recipe already saved") {
-      // If recipe is already saved, just return success
-      return { success: true, message: "Recipe already saved" }
-    }
     throw error
   }
 }
 
 export const toggleFavorite = async (recipeId, isFavorite) => {
   try {
+    console.log(`Toggling favorite for recipe ${recipeId} to ${isFavorite}`)
     const response = await api.put(`/recipes/saved/${recipeId}/favorite`, { isFavorite })
-    // Dispatch an event to notify that a recipe's favorite status was changed
-    window.dispatchEvent(new CustomEvent("favorite-toggled", { detail: response.data }))
+    console.log("Toggle favorite response:", response.data)
+
+    // Create a custom event with the response data
+    const event = new CustomEvent("favorite-toggled", {
+      detail: response.data,
+    })
+    window.dispatchEvent(event)
+
     return response.data
   } catch (error) {
     console.error("Error toggling favorite status:", error)
@@ -104,7 +118,9 @@ export const toggleFavorite = async (recipeId, isFavorite) => {
 
 export const removeSavedRecipe = async (recipeId) => {
   try {
+    console.log("Removing saved recipe:", recipeId)
     const response = await api.delete(`/recipes/saved/${recipeId}`)
+    console.log("Remove recipe response:", response.data)
     return response.data
   } catch (error) {
     console.error("Error removing saved recipe:", error)

@@ -1,5 +1,7 @@
 "use client"
 
+"use client"
+
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getRecipeById, saveRecipe, getSavedRecipes, toggleFavorite } from "../services/api"
@@ -46,6 +48,28 @@ const RecipeDetail = () => {
     }
 
     fetchRecipe()
+
+    // Listen for recipe saved or favorite toggled events
+    const handleRecipeSaved = () => {
+      setSaved(true)
+    }
+
+    const handleFavoriteToggled = (event) => {
+      if (event.detail && Array.isArray(event.detail)) {
+        const savedRecipe = event.detail.find((r) => r.recipeId === id.toString())
+        if (savedRecipe) {
+          setFavorite(savedRecipe.isFavorite || false)
+        }
+      }
+    }
+
+    window.addEventListener("recipe-saved", handleRecipeSaved)
+    window.addEventListener("favorite-toggled", handleFavoriteToggled)
+
+    return () => {
+      window.removeEventListener("recipe-saved", handleRecipeSaved)
+      window.removeEventListener("favorite-toggled", handleFavoriteToggled)
+    }
   }, [id])
 
   const handleSave = async () => {

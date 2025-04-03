@@ -9,4 +9,3 @@ const SavedRecipesPage = () => {
 }
 
 export default SavedRecipesPage
-

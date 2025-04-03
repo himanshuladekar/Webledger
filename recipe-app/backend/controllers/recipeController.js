@@ -57,8 +57,10 @@ exports.getRecipeById = async (req, res) => {
 exports.getSavedRecipes = async (req, res) => {
   try {
     const userId = req.user._id
+    console.log("Getting saved recipes for user:", userId)
 
     let savedRecipes = await SavedRecipe.findOne({ user: userId })
+    console.log("Found saved recipes:", savedRecipes)
 
     if (!savedRecipes) {
       // If no saved recipes document exists, create one
@@ -66,6 +68,7 @@ exports.getSavedRecipes = async (req, res) => {
         user: userId,
         recipes: [],
       })
+      console.log("Created new saved recipes document:", savedRecipes)
     }
 
     // Sort recipes by position before sending
@@ -83,6 +86,9 @@ exports.getSavedRecipes = async (req, res) => {
 exports.saveRecipe = async (req, res) => {
   try {
     const userId = req.user._id
+    console.log("Saving recipe for user:", userId)
+    console.log("Recipe data:", req.body)
+
     const { recipeId, title, image, sourceUrl, isFavorite } = req.body
 
     if (!recipeId || !title) {
@@ -90,6 +96,7 @@ exports.saveRecipe = async (req, res) => {
     }
 
     let savedRecipes = await SavedRecipe.findOne({ user: userId })
+    console.log("Found saved recipes document:", savedRecipes)
 
     if (!savedRecipes) {
       // If no saved recipes document exists, create one
@@ -97,6 +104,7 @@ exports.saveRecipe = async (req, res) => {
         user: userId,
         recipes: [],
       })
+      console.log("Created new saved recipes document:", savedRecipes)
     }
 
     // Check if recipe is already saved
@@ -104,9 +112,11 @@ exports.saveRecipe = async (req, res) => {
 
     if (existingRecipeIndex !== -1) {
       // Update existing recipe if it's already saved
+      console.log("Recipe already exists, updating favorite status")
       savedRecipes.recipes[existingRecipeIndex].isFavorite =
         isFavorite !== undefined ? isFavorite : savedRecipes.recipes[existingRecipeIndex].isFavorite
       await savedRecipes.save()
+      console.log("Updated saved recipes:", savedRecipes.recipes)
       return res.status(200).json(savedRecipes.recipes)
     }
 
@@ -123,6 +133,7 @@ exports.saveRecipe = async (req, res) => {
     })
 
     await savedRecipes.save()
+    console.log("Added new recipe, saved recipes now:", savedRecipes.recipes)
 
     res.status(201).json(savedRecipes.recipes)
   } catch (error) {
@@ -139,25 +150,32 @@ exports.toggleFavorite = async (req, res) => {
     const recipeId = req.params.id
     const { isFavorite } = req.body
 
+    console.log(`Toggling favorite for user ${userId}, recipe ${recipeId} to ${isFavorite}`)
+
     const savedRecipes = await SavedRecipe.findOne({ user: userId })
 
     if (!savedRecipes) {
+      console.log("No saved recipes found for user")
       return res.status(404).json({ message: "No saved recipes found" })
     }
 
     const recipeIndex = savedRecipes.recipes.findIndex((r) => r.recipeId === recipeId)
 
     if (recipeIndex === -1) {
+      console.log("Recipe not found in saved list")
       return res.status(404).json({ message: "Recipe not found in saved list" })
     }
 
     // Toggle favorite status
+    console.log(`Setting favorite status from ${savedRecipes.recipes[recipeIndex].isFavorite} to ${isFavorite}`)
     savedRecipes.recipes[recipeIndex].isFavorite = isFavorite
 
     await savedRecipes.save()
+    console.log("Saved recipes after toggle:", savedRecipes.recipes)
 
     res.json(savedRecipes.recipes)
   } catch (error) {
+    console.error("Error toggling favorite:", error)
     res.status(500).json({ message: error.message })
   }
 }
@@ -197,6 +215,7 @@ exports.removeSavedRecipe = async (req, res) => {
 
     res.json(savedRecipes.recipes)
   } catch (error) {
+    console.error("Error removing saved recipe:", error)
     res.status(500).json({ message: error.message })
   }
 }
@@ -236,6 +255,7 @@ exports.reorderSavedRecipes = async (req, res) => {
 
     res.json(savedRecipes.recipes)
   } catch (error) {
+    console.error("Error reordering saved recipes:", error)
     res.status(500).json({ message: error.message })
   }
 }
@@ -245,10 +265,13 @@ exports.reorderSavedRecipes = async (req, res) => {
 exports.getFavoriteRecipes = async (req, res) => {
   try {
     const userId = req.user._id
+    console.log("Getting favorite recipes for user:", userId)
 
     const savedRecipes = await SavedRecipe.findOne({ user: userId })
+    console.log("Found saved recipes:", savedRecipes)
 
     if (!savedRecipes) {
+      console.log("No saved recipes found, returning empty array")
       return res.json([])
     }
 
@@ -256,6 +279,8 @@ exports.getFavoriteRecipes = async (req, res) => {
     const favoriteRecipes = savedRecipes.recipes
       .filter((recipe) => recipe.isFavorite)
       .sort((a, b) => a.position - b.position)
+
+    console.log("Filtered favorite recipes:", favoriteRecipes)
 
     res.json(favoriteRecipes)
   } catch (error) {

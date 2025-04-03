@@ -18,12 +18,6 @@ router.get("/favorites", protect, getFavoriteRecipes)
 // Get saved recipes
 router.get("/saved", protect, getSavedRecipes)
 
-// Search recipes
-router.get("/search", searchRecipes)
-
-// Get recipe details
-router.get("/:id", getRecipeById)
-
 // Save a recipe
 router.post("/saved", protect, saveRecipe)
 
@@ -35,6 +29,12 @@ router.delete("/saved/:id", protect, removeSavedRecipe)
 
 // Reorder saved recipes
 router.put("/saved/reorder", protect, reorderSavedRecipes)
+
+// Search recipes - Keep these AFTER the more specific routes
+router.get("/search", searchRecipes)
+
+// Get recipe details - Keep this LAST to avoid conflicts
+router.get("/:id", getRecipeById)
 
 module.exports = router
 
